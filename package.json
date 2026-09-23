@@ -10,6 +10,7 @@
     "antigravity-plugin",
     "bin",
     "hooks",
+    "src",
     "server",
     "app.js",
     "index.html",
@@ -25,5 +26,9 @@
     "plugin:install": "node bin/loggie.js install",
     "doctor": "node bin/loggie.js doctor",
     "test": "node --test"
+  },
+  "dependencies": {
+    "@xterm/headless": "^6.0.0",
+    "node-pty": "^1.1.0"
   }
 }

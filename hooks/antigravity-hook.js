@@ -7,7 +7,8 @@ for await (const chunk of process.stdin) input += chunk;
 let payload = {};
 try {
   payload = JSON.parse(input || '{}');
-  await fetch('http://127.0.0.1:4317/api/events', {
+  const port = Number(process.env.LOGGIE_PORT || 4317);
+  await fetch(`http://127.0.0.1:${port}/api/events`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ kind, payload }),

@@ -29,3 +29,19 @@ test('classifies destructive commands as high risk', () => {
   });
   assert.equal(event.risk, 'high');
 });
+
+test('classifies read-only shell commands as low risk', () => {
+  const event = normalizeEvent({
+    kind: 'pre-tool',
+    payload: { toolCall: { name: 'run_command', args: { CommandLine: 'pwd' } } },
+  });
+  assert.equal(event.risk, 'low');
+});
+
+test('classifies forced process termination as high risk', () => {
+  const event = normalizeEvent({
+    kind: 'pre-tool',
+    payload: { toolCall: { name: 'run_command', args: { CommandLine: 'kill -9 14061' } } },
+  });
+  assert.equal(event.risk, 'high');
+});

@@ -53,20 +53,40 @@ if (args[0] === 'doctor') {
   } else {
     console.log('✗ Antigravity CLI not found');
   }
-  console.log('✓ Local inspector configured for http://127.0.0.1:4317');
+  console.log('✓ Terminal UI dependencies available');
+  console.log('✓ Optional web inspector configured for http://127.0.0.1:4317');
   process.exit(agy ? 0 : 1);
 }
 
-requireAgy();
+if (args[0] === '--web') {
+  requireAgy();
+  const server = spawn(process.execPath, [join(projectRoot, 'server/server.js')], { cwd: projectRoot, stdio: ['ignore', 'inherit', 'inherit'] });
+  await new Promise((resolve) => setTimeout(resolve, 450));
+  spawn('open', ['http://127.0.0.1:4317'], { stdio: 'ignore', detached: true }).unref();
 
-const server = spawn(process.execPath, [join(projectRoot, 'server/server.js')], { cwd: projectRoot, stdio: ['ignore', 'inherit', 'inherit'] });
-await new Promise((resolve) => setTimeout(resolve, 450));
-spawn('open', ['http://127.0.0.1:4317'], { stdio: 'ignore', detached: true }).unref();
+  console.log('\nLoggie web inspector is watching this Antigravity session.\n');
+  const agent = spawn(agy, args.slice(1), { cwd: process.cwd(), stdio: 'inherit' });
+  agent.on('exit', (code, signal) => {
+    server.kill('SIGTERM');
+    if (signal) process.kill(process.pid, signal);
+    else process.exit(code ?? 0);
+  });
+} else {
+  const { startTui } = await import('../src/tui/app.js');
+  let command;
+  let commandArgs = [];
+  if (args[0] === 'agy') {
+    command = requireAgy();
+    commandArgs = args.slice(1);
+  } else if (args[0] === 'claude') {
+    command = 'claude';
+    commandArgs = args.slice(1);
+  }
 
-console.log('\nLoggie is watching this Antigravity session.\n');
-const agent = spawn(agy, args, { cwd: process.cwd(), stdio: 'inherit' });
-agent.on('exit', (code, signal) => {
-  server.kill('SIGTERM');
-  if (signal) process.kill(process.pid, signal);
-  else process.exit(code ?? 0);
-});
+  try {
+    await startTui({ command, args: commandArgs, cwd: process.cwd() });
+  } catch (error) {
+    console.error(`Loggie could not start: ${error.message}`);
+    process.exit(1);
+  }
+}

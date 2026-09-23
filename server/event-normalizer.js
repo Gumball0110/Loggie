@@ -9,11 +9,12 @@ function targetFrom(args = {}) {
   return args.TargetFile || args.AbsolutePath || args.DirectoryPath || args.SearchPath || args.Url || '';
 }
 
-function riskFor(tool, args = {}) {
+export function riskFor(tool, args = {}) {
   const command = commandFrom(args).toLowerCase();
-  if (/\brm\s+(-[^ ]*r|--recursive)|\bsudo\b|git\s+(reset\s+--hard|push\s+.*--force)/.test(command)) return 'high';
+  if (/\brm\s+(-[^ ]*r|--recursive)|\bsudo\b|\bkill\s+-9\b|\b(mkfs|diskutil\s+erase|dd\s+if=)\b|git\s+(reset\s+--hard|push\s+.*--force)/.test(command)) return 'high';
   if (/npm\s+(install|i)\b|pnpm\s+(add|install)\b|yarn\s+add\b|curl\b|wget\b/.test(command)) return 'medium';
-  if (WRITE_TOOLS.has(tool) || tool === 'run_command') return 'medium';
+  if (WRITE_TOOLS.has(tool)) return 'medium';
+  if (/^\s*(cp|mv|mkdir|touch|chmod|chown)\b|git\s+(add|commit|merge|rebase|checkout|switch)\b|npm\s+(run\s+build|publish)\b/.test(command)) return 'medium';
   return 'low';
 }
 

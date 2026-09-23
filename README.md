@@ -1,63 +1,79 @@
 # Loggie
 
-Loggie turns AI coding-agent activity into a friendly, local action timeline.
+Loggie is a friendly terminal companion that explains commands, failures, risk, and AI coding-agent activity without requiring a separate browser window.
 
-## Try the live Antigravity inspector
+## Requirements
 
-Requirements:
-
+- macOS
 - Node.js 20 or newer
-- Antigravity CLI (`agy`)
+- zsh (for command lifecycle information)
 
-For local development, create the global `loggie` command and install its Antigravity plugin once:
+Antigravity CLI and Claude Code are optional. Loggie still works as a normal split terminal when neither is installed.
+
+## Install for local development
 
 ```bash
+npm install
 npm link
-loggie install
-loggie doctor
 ```
 
-Then enter any project and run:
+Start Loggie in any project:
 
 ```bash
 cd /path/to/your/project
 loggie
 ```
 
-Loggie will:
+The left side is a normal zsh session. The right side explains what happened in plain language, summarizes the command's raw output, and shows exit status, duration, risk, and supported AI-agent activity. The MVP explainer runs locally and does not require an AI API. Run ordinary commands or start an AI tool from the left side:
 
-1. start its local-only companion at `http://127.0.0.1:4317`;
-2. open the inspector in your browser;
-3. start Antigravity CLI in the current terminal;
-4. display Antigravity tool calls through workspace-level lifecycle hooks.
+```bash
+ls
+npm test
+agy
+claude
+```
 
-The first launch of Antigravity may open a Google sign-in page. Loggie does not receive or store your Google credentials.
+Type `exit` to close Loggie.
 
-To exit, quit Antigravity in the terminal. The Loggie companion stops with it.
+## AI integrations
 
-## Demo site
+Install the observer plugin once for deeper Antigravity activity:
 
-The GitHub Pages build is a static visual demo. Live terminal events are available only from the local companion:
+```bash
+loggie install
+loggie doctor
+```
+
+You can start an AI tool directly inside the TUI:
+
+```bash
+loggie agy
+loggie claude
+```
+
+Claude currently runs inside the Loggie terminal, but its dedicated hook adapter is planned for a later version.
+
+## Optional web inspector
+
+The previous browser experience remains available:
+
+```bash
+loggie --web
+```
+
+The GitHub Pages build is a static visual demo:
 
 https://gumball0110.github.io/Loggie/
 
 ## Development
 
-Run the local inspector without launching Antigravity:
-
-```bash
-npm start
-```
-
-Run tests:
-
 ```bash
 npm test
 ```
 
-Antigravity integration is packaged in `antigravity-plugin/`. The hooks are observer-only in this version: they report events but do not change or block agent actions.
+The TUI uses a local pseudo-terminal and an in-memory terminal emulator. Shell integration is injected through a temporary zsh configuration and removed when the session ends; Loggie does not edit the user's `.zshrc`.
 
-Remove the plugin with:
+Remove the Antigravity plugin with:
 
 ```bash
 loggie uninstall
