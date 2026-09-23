@@ -17,8 +17,8 @@ export function startCommand(state, command, cwd, now = Date.now()) {
   state.durationMs = null;
   state.exitCode = null;
   state.risk = riskFor('run_command', { CommandLine: command });
-  state.summaryTitle = '正在執行指令';
-  state.explanation = 'Terminal 正在執行這個指令。';
+  state.summaryTitle = 'Running command';
+  state.explanation = 'The terminal is running this command.';
   state.suggestion = '';
   state.rawSummary = '';
 }

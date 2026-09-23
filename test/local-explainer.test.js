@@ -4,9 +4,9 @@ import { cleanTerminalOutput, explainCommand, summarizeOutput } from '../src/exp
 
 test('explains an unquoted folder path in plain language', () => {
   const result = explainCommand('cd document/ Design Tech', 'cd: too many arguments\r\n', 1);
-  assert.equal(result.title, '無法切換資料夾');
-  assert.match(result.explanation, /路徑包含空格/);
-  assert.equal(result.suggestion, '請改用：cd "document/ Design Tech"');
+  assert.equal(result.title, 'Could not change folders');
+  assert.match(result.explanation, /path contains spaces/);
+  assert.equal(result.suggestion, 'Try this instead: cd "document/ Design Tech"');
   assert.match(result.rawSummary, /too many arguments/);
 });
 
@@ -18,7 +18,7 @@ test('summarizes a long raw log around important lines', () => {
 test('turns test runner totals into a compact summary', () => {
   const output = ['tests 11', 'pass 11', 'fail 0'].join('\n');
   const result = explainCommand('npm test', output, 0);
-  assert.equal(result.rawSummary, '共 11 項，11 項通過，0 項失敗。');
+  assert.equal(result.rawSummary, '11 total, 11 passed, 0 failed.');
 });
 
 test('removes terminal colors from captured output', () => {

@@ -23,20 +23,20 @@ function testResultSummary(output) {
   const failed = output.match(/(?:^|\n)[^\n]*fail\s+(\d+)\b/i)?.[1];
   if (!tests && !passed && !failed) return '';
   const parts = [];
-  if (tests) parts.push(`共 ${tests} 項`);
-  if (passed) parts.push(`${passed} 項通過`);
-  if (failed) parts.push(`${failed} 項失敗`);
-  return `${parts.join('，')}。`;
+  if (tests) parts.push(`${tests} total`);
+  if (passed) parts.push(`${passed} passed`);
+  if (failed) parts.push(`${failed} failed`);
+  return `${parts.join(', ')}.`;
 }
 
 export function summarizeOutput(output, exitCode) {
   const clean = cleanTerminalOutput(output);
-  if (!clean) return Number(exitCode) === 0 ? '指令沒有產生額外輸出。' : '指令失敗，但沒有提供錯誤細節。';
+  if (!clean) return Number(exitCode) === 0 ? 'The command produced no additional output.' : 'The command failed without providing error details.';
   const lines = clean.split('\n').map((line) => line.trim()).filter(Boolean);
   const important = importantLines(lines);
   if (important.length) return important.join(' · ');
   if (lines.length <= 2) return lines.join(' · ');
-  return `共 ${lines.length} 行輸出；最後訊息：${lines.at(-1)}`;
+  return `${lines.length} lines of output. Last message: ${lines.at(-1)}`;
 }
 
 function firstArgument(command) {
@@ -54,21 +54,21 @@ export function explainCommand(command, output, exitCode) {
   const trimmed = String(command || '').trim();
   const name = trimmed.split(/\s+/)[0] || 'command';
   const result = {
-    title: failed ? '指令沒有成功' : '指令已完成',
-    explanation: failed ? 'Terminal 回報執行失敗。' : 'Terminal 已完成這個指令。',
+    title: failed ? 'Command failed' : 'Command completed',
+    explanation: failed ? 'The terminal reported that the command failed.' : 'The terminal finished running this command.',
     suggestion: '',
     rawSummary: summarizeOutput(clean, exitCode),
   };
 
   if (name === 'cd') {
-    result.title = failed ? '無法切換資料夾' : '已切換資料夾';
-    result.explanation = failed ? 'Terminal 沒有進入你指定的資料夾。' : `目前已進入 ${firstArgument(trimmed) || '指定的資料夾'}。`;
+    result.title = failed ? 'Could not change folders' : 'Changed folders';
+    result.explanation = failed ? 'The terminal could not open the folder you specified.' : `You are now in ${firstArgument(trimmed) || 'the requested folder'}.`;
     if (/too many arguments/i.test(clean)) {
-      result.explanation = '資料夾路徑包含空格，Terminal 把它拆成了多個參數。';
-      result.suggestion = `請改用：${quotedCd(trimmed)}`;
+      result.explanation = 'The folder path contains spaces, so the terminal treated it as multiple inputs.';
+      result.suggestion = `Try this instead: ${quotedCd(trimmed)}`;
     } else if (/no such file|not found/i.test(clean)) {
-      result.explanation = '找不到這個資料夾，可能是名稱、大小寫或路徑位置不正確。';
-      result.suggestion = '先執行 ls 查看目前位置有哪些資料夾。';
+      result.explanation = 'That folder could not be found. Its name, capitalization, or location may be incorrect.';
+      result.suggestion = 'Run ls first to see which folders are available here.';
     }
     return result;
   }
@@ -76,32 +76,32 @@ export function explainCommand(command, output, exitCode) {
   if (name === 'pwd') {
     return {
       ...result,
-      title: '已確認目前位置',
-      explanation: clean ? `你現在位於：${clean.split('\n').at(-1)}` : 'Terminal 已確認目前所在的資料夾。',
+      title: 'Current location confirmed',
+      explanation: clean ? `You are currently in: ${clean.split('\n').at(-1)}` : 'The terminal confirmed your current folder.',
     };
   }
 
   if (/^(ls|find)$/.test(name)) {
-    result.title = failed ? '無法列出檔案' : '已列出檔案';
-    result.explanation = failed ? 'Terminal 無法讀取指定位置的檔案清單。' : '這個指令只是在查看檔案，沒有修改內容。';
+    result.title = failed ? 'Could not list files' : 'Files listed';
+    result.explanation = failed ? 'The terminal could not read the files at that location.' : 'This command only viewed files. It did not change anything.';
   } else if (/^(npm|pnpm|yarn)$/.test(name) && /\btest\b/.test(trimmed)) {
-    result.title = failed ? '測試沒有全部通過' : '測試已完成';
-    result.explanation = failed ? '至少有一項自動測試失敗，需要查看錯誤重點。' : '自動測試成功完成。';
+    result.title = failed ? 'Some tests did not pass' : 'Tests completed';
+    result.explanation = failed ? 'At least one automated test failed. Check the error summary for details.' : 'The automated tests completed successfully.';
     result.rawSummary = testResultSummary(clean) || result.rawSummary;
   } else if (/permission denied/i.test(clean)) {
-    result.title = '沒有足夠權限';
-    result.explanation = '目前的帳號沒有執行這個操作所需的檔案或系統權限。';
-    result.suggestion = '先確認檔案擁有者和權限，不要直接使用 sudo。';
+    result.title = 'Permission denied';
+    result.explanation = 'Your account does not have the file or system permission required for this action.';
+    result.suggestion = 'Check the file owner and permissions before trying sudo.';
   } else if (/command not found/i.test(clean)) {
-    result.title = '找不到這個指令';
-    result.explanation = `Terminal 找不到 ${name}，它可能尚未安裝或不在 PATH 中。`;
-    result.suggestion = `先確認 ${name} 是否已安裝。`;
+    result.title = 'Command not found';
+    result.explanation = `The terminal could not find ${name}. It may not be installed or available in your PATH.`;
+    result.suggestion = `Check whether ${name} is installed.`;
   } else if (/address already in use|port .*in use/i.test(clean)) {
-    result.title = '連接埠已被使用';
-    result.explanation = '另一個程式正在使用相同的 port，所以服務無法啟動。';
-    result.suggestion = '關閉原本的服務，或改用另一個 port。';
+    result.title = 'Port already in use';
+    result.explanation = 'Another program is using the same port, so this service could not start.';
+    result.suggestion = 'Stop the other service or choose a different port.';
   } else if (failed && clean) {
-    result.explanation = `Terminal 的錯誤重點是：${result.rawSummary}`;
+    result.explanation = `The most relevant terminal message is: ${result.rawSummary}`;
   }
 
   return result;
