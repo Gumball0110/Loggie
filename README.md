@@ -9,10 +9,19 @@ Requirements:
 - Node.js 20 or newer
 - Antigravity CLI (`agy`)
 
-From this repository, run:
+For local development, create the global `loggie` command and install its Antigravity plugin once:
 
 ```bash
-npm run loggie
+npm link
+loggie install
+loggie doctor
+```
+
+Then enter any project and run:
+
+```bash
+cd /path/to/your/project
+loggie
 ```
 
 Loggie will:
@@ -46,4 +55,10 @@ Run tests:
 npm test
 ```
 
-Antigravity integration is configured in `.agents/hooks.json`. The hooks are observer-only in this version: they report events but do not change or block agent actions.
+Antigravity integration is packaged in `antigravity-plugin/`. The hooks are observer-only in this version: they report events but do not change or block agent actions.
+
+Remove the plugin with:
+
+```bash
+loggie uninstall
+```

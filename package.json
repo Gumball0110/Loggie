@@ -1,14 +1,29 @@
 {
   "name": "loggie",
   "version": "0.1.0",
-  "private": true,
+  "description": "A friendly local action inspector for AI coding tools.",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "antigravity-plugin",
+    "bin",
+    "hooks",
+    "server",
+    "app.js",
+    "index.html",
+    "styles.css",
+    "README.md"
+  ],
   "bin": {
     "loggie": "./bin/loggie.js"
   },
   "scripts": {
     "start": "node server/server.js",
     "loggie": "node bin/loggie.js",
+    "plugin:install": "node bin/loggie.js install",
+    "doctor": "node bin/loggie.js doctor",
     "test": "node --test"
   }
 }

@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node hooks/antigravity-hook.js pre-tool",
+            "command": "loggie hook pre-tool",
             "timeout": 5
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node hooks/antigravity-hook.js post-tool",
+            "command": "loggie hook post-tool",
             "timeout": 5
           }
         ]
@@ -27,21 +27,21 @@
     "PreInvocation": [
       {
         "type": "command",
-        "command": "node hooks/antigravity-hook.js pre-invocation",
+        "command": "loggie hook pre-invocation",
         "timeout": 5
       }
     ],
     "PostInvocation": [
       {
         "type": "command",
-        "command": "node hooks/antigravity-hook.js post-invocation",
+        "command": "loggie hook post-invocation",
         "timeout": 5
       }
     ],
     "Stop": [
       {
         "type": "command",
-        "command": "node hooks/antigravity-hook.js stop",
+        "command": "loggie hook stop",
         "timeout": 5
       }
     ]
