@@ -67,7 +67,6 @@ function panelLines(state, width, height) {
       const duration = state.durationMs === null ? '' : ` | ${humanDuration(state.durationMs)}`;
       add(`${chip(`${state.risk.toUpperCase()} RISK`, state.risk)} ${style(`${exit}${duration}`, { fg: palette.muted })}`);
     } else {
-      add(style('ready when you are.', { fg: palette.ink, bold: true }));
       add(style('Run a command above.', { fg: palette.muted }));
     }
     if (latestEvent) add(`${style('AI', { fg: palette.pink, bold: true })} ${truncateMiddle(latestEvent.title, inner - 4)}`);
@@ -78,11 +77,7 @@ function panelLines(state, width, height) {
   if (!state.command) {
     add(style('YOUR TERMINAL', { fg: palette.pink, bold: true }));
     add('');
-    add(style('ready when you are.', { fg: palette.ink, bold: true }));
-    add('');
     for (const line of wrapText('Type a command on the left. Loggie will explain what happens.', inner, 3)) add(style(line, { fg: palette.muted }));
-    add('');
-    add(style('made a little less scary  ↘', { fg: palette.muted, dim: true }));
   } else if (latestEvent && isRunning) {
     add(style('WHAT THE AI IS DOING', { fg: palette.pink, bold: true }));
     add('');
