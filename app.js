@@ -3,6 +3,7 @@ const state = {
   command: 'npm run dev',
   timer: null,
   speechActive: false,
+  liveEvents: [],
 };
 
 const copy = {
@@ -60,7 +61,75 @@ const elements = {
   voiceButtonText: document.querySelector('#voiceButtonText'),
   companion: document.querySelector('#companion'),
   lastUpdated: document.querySelector('#lastUpdated'),
+  liveInspector: document.querySelector('#liveInspector'),
+  liveProvider: document.querySelector('#liveProvider'),
+  liveSession: document.querySelector('#liveSession'),
+  liveTitle: document.querySelector('#liveTitle'),
+  liveDescription: document.querySelector('#liveDescription'),
+  actionTimeline: document.querySelector('#actionTimeline'),
 };
+
+function iconFor(event) {
+  if (event.status === 'error') return '!';
+  if (event.status === 'complete') return '✓';
+  if (event.category === 'write') return '✎';
+  if (event.category === 'execute') return '$';
+  return '●';
+}
+
+function renderLiveEvent(event) {
+  if (!event || event.type === 'connected') return;
+  document.body.classList.add('local-mode');
+  elements.liveInspector.hidden = false;
+  state.liveEvents.unshift(event);
+  state.liveEvents = state.liveEvents.slice(0, 12);
+  elements.liveProvider.textContent = event.model ? `Antigravity · ${event.model}` : 'Antigravity';
+  elements.liveSession.textContent = event.workspace || `session ${event.sessionId.slice(0, 8)}`;
+  elements.liveTitle.textContent = event.title;
+  elements.liveDescription.textContent = event.description;
+  elements.commandText.textContent = event.command || event.tool.replaceAll('_', ' ');
+  elements.lastUpdated.textContent = 'live now';
+  elements.actionTimeline.replaceChildren(...state.liveEvents.map((item) => {
+    const row = document.createElement('article');
+    row.className = 'action-item';
+    row.dataset.status = item.status;
+    const icon = document.createElement('span');
+    icon.className = 'action-icon';
+    icon.textContent = iconFor(item);
+    const copyWrap = document.createElement('div');
+    copyWrap.className = 'action-copy';
+    const title = document.createElement('strong');
+    title.textContent = item.title;
+    const detail = document.createElement('code');
+    detail.textContent = item.description;
+    copyWrap.append(title, detail);
+    const risk = document.createElement('span');
+    risk.className = `risk-chip ${item.risk}`;
+    risk.textContent = `${item.risk} risk`;
+    row.append(icon, copyWrap, risk);
+    return row;
+  }));
+}
+
+function connectLiveInspector() {
+  if (!['localhost', '127.0.0.1'].includes(window.location.hostname)) return;
+  const stream = new EventSource('/api/events/stream');
+  stream.onmessage = ({ data }) => {
+    try {
+      const message = JSON.parse(data);
+      if (message.type === 'connected') {
+        for (const event of message.events || []) renderLiveEvent(event);
+        if (!message.events?.length) {
+          document.body.classList.add('local-mode');
+          elements.liveInspector.hidden = false;
+        }
+      } else renderLiveEvent(message);
+    } catch {}
+  };
+  stream.onerror = () => {
+    elements.liveSession.textContent = 'reconnecting to local companion…';
+  };
+}
 
 function render(nextState) {
   state.current = nextState;
@@ -192,3 +261,4 @@ elements.commandInput.addEventListener('keydown', (event) => {
 });
 
 render('running');
+connectLiveInspector();

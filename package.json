@@ -1,0 +1,14 @@
+{
+  "name": "loggie",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "loggie": "./bin/loggie.js"
+  },
+  "scripts": {
+    "start": "node server/server.js",
+    "loggie": "node bin/loggie.js",
+    "test": "node --test"
+  }
+}

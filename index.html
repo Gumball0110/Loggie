@@ -35,7 +35,23 @@
           <span class="command-cursor" aria-hidden="true"></span>
         </div>
 
-        <section class="summary-section" aria-live="polite">
+        <section class="live-inspector" id="liveInspector" hidden aria-live="polite">
+          <div class="live-inspector-header">
+            <div>
+              <span class="live-badge"><span class="live-dot"></span> LIVE</span>
+              <span class="live-provider" id="liveProvider">Antigravity</span>
+            </div>
+            <span class="live-session" id="liveSession">waiting for an agent session</span>
+          </div>
+          <div class="live-summary">
+            <span class="details-label">WHAT THE AI IS DOING</span>
+            <h2 id="liveTitle">waiting for Antigravity</h2>
+            <p id="liveDescription">Start an Antigravity task in the terminal. Tool calls will appear here as they happen.</p>
+          </div>
+          <div class="action-timeline" id="actionTimeline"></div>
+        </section>
+
+        <section class="summary-section" id="demoSummary" aria-live="polite">
           <div class="companion-wrap" id="companionWrap" aria-label="Loggie companion">
             <div class="companion" id="companion" aria-hidden="true">
               <span class="companion-eye left"></span>
@@ -118,7 +134,7 @@
         </section>
       </section>
 
-      <footer class="bottom-area">
+      <footer class="bottom-area" id="demoFooter">
         <div class="command-form-wrap">
           <div class="form-label"><span>TRY ANOTHER COMMAND</span><span class="form-hint">simulated, promise</span></div>
           <form class="command-form" id="commandForm">
