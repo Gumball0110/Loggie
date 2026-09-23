@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f6f1" />
+    <title>loggie — terminal, translated for humans.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#top" aria-label="Loggie home">
+          <span class="brand-mark" aria-hidden="true">✦</span>
+          <span>loggie</span>
+        </a>
+        <div class="topbar-meta">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>AI terminal companion</span>
+        </div>
+      </header>
+
+      <section class="workspace" id="top">
+        <div class="eyebrow-row">
+          <span class="eyebrow">YOUR PROJECT</span>
+          <span class="time-note" id="lastUpdated">just now</span>
+        </div>
+
+        <div class="command-line" aria-label="Current command">
+          <span class="prompt">$</span>
+          <span id="commandText">npm run dev</span>
+          <span class="command-cursor" aria-hidden="true"></span>
+        </div>
+
+        <section class="summary-section" aria-live="polite">
+          <div class="companion-wrap" id="companionWrap" aria-label="Loggie companion">
+            <div class="companion" id="companion" aria-hidden="true">
+              <span class="companion-eye left"></span>
+              <span class="companion-eye right"></span>
+              <span class="companion-mouth"></span>
+              <span class="companion-spark spark-one">✦</span>
+              <span class="companion-spark spark-two">·</span>
+            </div>
+          </div>
+
+          <div class="state-kicker" id="stateKicker">LOGGIE IS ON IT</div>
+          <h1 id="stateTitle">starting your project<span class="title-tail">...</span></h1>
+          <p class="state-intro" id="stateIntro">I’m quietly checking the usual scary bits for you.</p>
+
+          <div class="progress-list" id="progressList">
+            <div class="progress-item complete" data-step="dependencies">
+              <span class="step-icon">✓</span>
+              <span>checking dependencies</span>
+            </div>
+            <div class="progress-item complete" data-step="build">
+              <span class="step-icon">✓</span>
+              <span>building your app</span>
+            </div>
+            <div class="progress-item active" data-step="server">
+              <span class="step-icon">●</span>
+              <span>starting local server</span>
+            </div>
+          </div>
+
+          <p class="reassurance" id="reassurance">everything looks good so far.<br />you don’t need to do anything right now.</p>
+
+          <div class="primary-actions">
+            <button class="pill-button voice-button" id="voiceButton" type="button">
+              <span class="button-icon" aria-hidden="true">◖</span>
+              <span id="voiceButtonText">explain what’s happening</span>
+            </button>
+            <button class="text-button" id="rawLogsButton" type="button">
+              <span aria-hidden="true">&lt;/&gt;</span>
+              <span id="rawLogsButtonText">view raw logs</span>
+            </button>
+          </div>
+
+          <div class="error-details" id="errorDetails" hidden>
+            <div class="details-block">
+              <span class="details-label">WHAT HAPPENED</span>
+              <p>Your project needs a package called <strong>vite</strong>, but it isn’t installed yet.</p>
+            </div>
+            <div class="details-block">
+              <span class="details-label">WHAT THIS MEANS</span>
+              <p>Your code isn’t necessarily broken. The project is just missing something it needs before it can start.</p>
+            </div>
+            <div class="details-block">
+              <span class="details-label">WHAT TO DO NEXT</span>
+              <p>Install the missing package, then try starting your project again.</p>
+            </div>
+            <div class="error-actions">
+              <button class="pill-button fix-button" id="fixButton" type="button">help me fix it <span aria-hidden="true">→</span></button>
+            </div>
+          </div>
+
+          <div class="warning-details" id="warningDetails" hidden>
+            <div class="warning-count"><span>02</span> small things worth knowing</div>
+            <div class="warning-item"><span>01</span><p>Your bundle is a little bigger than usual.</p></div>
+            <div class="warning-item"><span>02</span><p>One dependency has a newer version available.</p></div>
+          </div>
+        </section>
+
+        <section class="success-panel" id="successPanel" hidden>
+          <div class="success-line"><span class="success-check">✓</span><span>local server ready</span></div>
+          <div class="local-url"><span class="url-dot"></span>localhost:3000</div>
+          <button class="pill-button open-button" id="openButton" type="button">open project <span aria-hidden="true">↗</span></button>
+        </section>
+
+        <section class="raw-logs" id="rawLogs" hidden>
+          <div class="raw-header">
+            <div><span class="raw-label">ORIGINAL OUTPUT</span><span class="raw-note">for curious humans</span></div>
+            <button class="close-logs" id="closeLogsButton" type="button" aria-label="Hide raw logs">×</button>
+          </div>
+          <pre id="logOutput"></pre>
+        </section>
+      </section>
+
+      <footer class="bottom-area">
+        <div class="command-form-wrap">
+          <div class="form-label"><span>TRY ANOTHER COMMAND</span><span class="form-hint">simulated, promise</span></div>
+          <form class="command-form" id="commandForm">
+            <label class="input-wrap">
+              <span class="input-prompt">$</span>
+              <input id="commandInput" autocomplete="off" spellcheck="false" placeholder="try a command..." value="npm run dev" />
+            </label>
+            <button class="run-button" type="submit">run <span aria-hidden="true">→</span></button>
+          </form>
+        </div>
+        <div class="demo-controls">
+          <span class="demo-label">DEMO MODE</span>
+          <div class="demo-buttons" role="group" aria-label="Demo state controls">
+            <button type="button" data-demo-state="running">running</button>
+            <button type="button" data-demo-state="success">success</button>
+            <button type="button" data-demo-state="warning">warning</button>
+            <button type="button" data-demo-state="error">error</button>
+          </div>
+        </div>
+        <div class="footer-scribble" aria-hidden="true">made a little less scary <span>↘</span></div>
+      </footer>
+    </main>
+    <script src="app.js"></script>
+  </body>
+</html>
