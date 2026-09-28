@@ -9,6 +9,7 @@
   "files": [
     "antigravity-plugin",
     "bin",
+    "desktop",
     "hooks",
     "src",
     "server",
@@ -22,6 +23,8 @@
   },
   "scripts": {
     "start": "node server/server.js",
+    "desktop": "electron desktop/main.js",
+    "desktop:smoke": "LOGGIE_DESKTOP_SMOKE_TEST=1 electron desktop/main.js",
     "loggie": "node bin/loggie.js",
     "plugin:install": "node bin/loggie.js install",
     "doctor": "node bin/loggie.js doctor",
@@ -30,5 +33,8 @@
   "dependencies": {
     "@xterm/headless": "^6.0.0",
     "node-pty": "^1.1.0"
+  },
+  "devDependencies": {
+    "electron": "^44.4.5"
   }
 }
