@@ -76,7 +76,7 @@ async function createCompanionWindow() {
     ...companionBounds(display.workArea, savedPosition),
     acceptFirstMouse: true,
     alwaysOnTop: true,
-    backgroundColor: '#00000000',
+    backgroundColor: '#f7f6f1',
     frame: false,
     hasShadow: false,
     resizable: false,
@@ -120,9 +120,7 @@ async function createPanelWindow() {
     title: 'Loggie',
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'hidden',
     trafficLightPosition: process.platform === 'darwin' ? { x: 14, y: 16 } : undefined,
-    transparent: true,
-    vibrancy: process.platform === 'darwin' ? 'sidebar' : undefined,
-    visualEffectState: process.platform === 'darwin' ? 'active' : undefined,
+    transparent: false,
     webPreferences: commonWebPreferences(),
   });
   panelWindow.setAlwaysOnTop(true, 'floating');

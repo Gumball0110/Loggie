@@ -1,7 +1,7 @@
 :root {
-  color-scheme: light dark;
-  --paper: rgb(246 246 246 / 76%);
-  --surface: rgb(255 255 255 / 72%);
+  color-scheme: light;
+  --paper: #f7f6f1;
+  --surface: #fffef9;
   --ink: rgb(28 28 30);
   --muted: rgb(99 99 102);
   --tertiary: rgb(142 142 147);
@@ -54,9 +54,9 @@ button { cursor: pointer; }
 .mouth { position: absolute; left: 35px; top: 43px; width: 11px; height: 7px; border-bottom: 2px solid var(--ink); border-radius: 50%; }
 .spark { position: absolute; right: -9px; top: -17px; color: var(--pink); font: 700 22px var(--sans); }
 
-.panel-page { height: 100vh; color: var(--ink); background: transparent; font-family: var(--sans); overflow: hidden; -webkit-font-smoothing: antialiased; }
+.panel-page { height: 100vh; color: var(--ink); background: var(--paper); font-family: var(--sans); overflow: hidden; -webkit-font-smoothing: antialiased; }
 .panel-shell { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; }
-.panel-header { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 12px 0 78px; border-bottom: .5px solid var(--line); background: rgb(246 246 246 / 52%); }
+.panel-header { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 12px 0 78px; border-bottom: .5px solid var(--line); background: #f1f0eb; }
 .brand { display: flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 600; letter-spacing: 0; }
 .brand-mark { color: var(--pink); }
 .header-actions { display: flex; align-items: center; gap: 10px; }
@@ -64,7 +64,7 @@ button { cursor: pointer; }
 .icon-button { width: 28px; height: 24px; padding: 0; border: 0; border-radius: 6px; color: var(--muted); background: transparent; font-size: 25px; line-height: 18px; }
 .icon-button:hover { color: var(--ink); background: rgb(120 120 128 / 12%); }
 
-.conversation { padding: 28px 20px 40px; overflow-y: auto; background: rgb(246 246 246 / 30%); }
+.conversation { padding: 28px 20px 40px; overflow-y: auto; background: var(--paper); }
 h1 { margin: 0; font-size: 26px; font-weight: 700; line-height: 1.2; letter-spacing: -.02em; }
 .intro { margin: 7px 0 30px; color: var(--muted); font-size: 13px; line-height: 1.45; }
 .settings-section { margin-top: 24px; }
@@ -88,7 +88,7 @@ kbd { min-width: 42px; padding: 3px 6px; border: .5px solid var(--line); border-
 .message.user { margin-left: auto; color: white; background: var(--blue); }
 .message.assistant { background: var(--surface); box-shadow: 0 0 0 .5px var(--line); }
 
-.composer { padding: 10px 12px 12px; border-top: .5px solid var(--line); background: rgb(246 246 246 / 72%); }
+.composer { padding: 10px 12px 12px; border-top: .5px solid var(--line); background: #f1f0eb; }
 .input-row { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 7px; padding: 6px 6px 6px 10px; border: .5px solid rgb(60 60 67 / 28%); border-radius: 10px; background: rgb(255 255 255 / 86%); box-shadow: 0 1px 2px rgb(0 0 0 / 5%); }
 textarea { width: 100%; min-height: 28px; max-height: 100px; padding: 4px 0; resize: none; border: 0; outline: 0; color: var(--ink); background: transparent; font-size: 13px; line-height: 20px; }
 textarea::placeholder { color: var(--tertiary); }
@@ -97,20 +97,6 @@ textarea::placeholder { color: var(--tertiary); }
 .composer-meta { display: flex; justify-content: space-between; margin: 7px 3px 0; color: var(--tertiary); font-size: 10px; }
 .text-button { padding: 0; border: 0; color: var(--blue); background: none; font: inherit; }
 .text-button:hover { color: var(--ink); }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: rgb(30 30 30 / 76%);
-    --surface: rgb(52 52 54 / 74%);
-    --ink: rgb(242 242 247);
-    --muted: rgb(174 174 178);
-    --tertiary: rgb(142 142 147);
-    --line: rgb(235 235 245 / 16%);
-  }
-  .panel-header, .composer { background: rgb(32 32 34 / 62%); }
-  .conversation { background: rgb(28 28 30 / 34%); }
-  .input-row { background: rgb(58 58 60 / 82%); }
-}
 
 @media (max-width: 370px) {
   .connection { display: none; }
