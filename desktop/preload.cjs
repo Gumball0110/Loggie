@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron';
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('loggie', Object.freeze({
   togglePanel: () => ipcRenderer.invoke('loggie:toggle-panel'),

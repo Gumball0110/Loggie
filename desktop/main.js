@@ -21,7 +21,7 @@ function rendererPath(fileName) {
 }
 
 function preloadPath() {
-  return join(desktopDirectory, 'preload.js');
+  return join(desktopDirectory, 'preload.cjs');
 }
 
 function statePath() {
@@ -74,6 +74,7 @@ async function createCompanionWindow() {
 
   companionWindow = new BrowserWindow({
     ...companionBounds(display.workArea, savedPosition),
+    acceptFirstMouse: true,
     alwaysOnTop: true,
     backgroundColor: '#00000000',
     frame: false,
@@ -196,7 +197,14 @@ app.whenReady().then(async () => {
   }
 
   if (process.env.LOGGIE_DESKTOP_SMOKE_TEST === '1') {
-    await expandPanel();
+    const assistant = await createPanelWindow();
+    const bridgeReady = await assistant.webContents.executeJavaScript(
+      'typeof window.loggie?.collapsePanel === "function"',
+    );
+    if (!bridgeReady) {
+      console.error('Desktop smoke test failed: the secure renderer bridge did not load.');
+      process.exitCode = 1;
+    }
     setTimeout(() => app.quit(), 500);
   }
 });
