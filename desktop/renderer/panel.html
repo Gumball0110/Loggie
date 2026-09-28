@@ -10,39 +10,53 @@
   <body class="panel-page">
     <main class="panel-shell">
       <header class="panel-header drag-region">
-        <div class="brand"><span class="brand-mark">✦</span><span>loggie</span></div>
+        <div class="brand"><span class="brand-mark">✦</span><span>Loggie</span></div>
         <div class="header-actions no-drag">
-          <span class="connection"><span class="status-dot"></span>desktop ready</span>
-          <button class="icon-button" id="minimize" type="button" aria-label="Minimize to companion">—</button>
+          <button class="icon-button" id="minimize" type="button" aria-label="Minimize to companion" title="Minimize to companion">
+            <span aria-hidden="true">‹</span>
+          </button>
         </div>
       </header>
 
       <section class="conversation" id="conversation" aria-live="polite">
-        <div class="welcome-symbol" aria-hidden="true">✦</div>
-        <p class="eyebrow">YOUR LITTLE AI COMPANION</p>
         <h1>Hi, I’m Loggie.</h1>
-        <p class="intro">I’m ready on your desktop. Gmail isn’t connected yet, so for now you can explore the companion and sidebar safely.</p>
+        <p class="intro">I’m ready when you are. Gmail hasn’t been connected yet.</p>
 
-        <article class="update-card">
-          <span class="update-icon">✓</span>
-          <div><strong>Desktop companion is ready</strong><p>Click the mascot or press <kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>L</kbd> to open and close me.</p></div>
-        </article>
+        <section class="settings-section" aria-labelledby="status-heading">
+          <h2 id="status-heading">Status</h2>
+          <div class="settings-group">
+            <div class="settings-row">
+              <span class="row-icon ready-icon" aria-hidden="true">✓</span>
+              <div class="row-copy"><strong>Desktop companion</strong><span>Ready</span></div>
+              <span class="status-dot" aria-label="Connected"></span>
+            </div>
+            <div class="settings-row shortcut-row">
+              <span class="row-icon shortcut-icon" aria-hidden="true">⌨</span>
+              <div class="row-copy"><strong>Keyboard shortcut</strong><span>Open or close Loggie</span></div>
+              <kbd>⌘⇧L</kbd>
+            </div>
+          </div>
+        </section>
 
-        <article class="setup-card">
-          <p class="eyebrow">COMING IN MILESTONE 2</p>
-          <h2>Connect Gmail</h2>
-          <p>You’ll authorize your own account in the browser before Loggie can search or read email.</p>
-          <button type="button" disabled>connect Gmail — not available yet</button>
-        </article>
+        <section class="settings-section" aria-labelledby="accounts-heading">
+          <h2 id="accounts-heading">Accounts</h2>
+          <div class="settings-group">
+            <div class="settings-row account-row">
+              <span class="row-icon mail-icon" aria-hidden="true"></span>
+              <div class="row-copy"><strong>Gmail</strong><span>Available in Milestone 2</span></div>
+              <button class="connect-button" type="button" disabled>Connect</button>
+            </div>
+          </div>
+          <p class="section-note">You’ll review Google’s authorization screen before Loggie can read any email.</p>
+        </section>
       </section>
 
       <form class="composer" id="composer">
-        <label for="message">Ask Loggie</label>
         <div class="input-row">
-          <textarea id="message" rows="2" maxlength="2000" placeholder="e.g. reply to Daniel’s latest email"></textarea>
-          <button class="send-button" type="submit" aria-label="Send message">→</button>
+          <textarea id="message" rows="1" maxlength="2000" aria-label="Ask Loggie" placeholder="Ask Loggie"></textarea>
+          <button class="send-button" type="submit" aria-label="Send message"><span aria-hidden="true">↑</span></button>
         </div>
-        <div class="composer-meta"><span>Voice unavailable</span><button id="hide" class="text-button" type="button">hide Loggie</button></div>
+        <div class="composer-meta"><span>Voice input isn’t available yet</span><button id="hide" class="text-button" type="button">Hide Loggie</button></div>
       </form>
     </main>
     <script src="panel.js"></script>

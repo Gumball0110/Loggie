@@ -109,18 +109,32 @@ async function createPanelWindow() {
   panelWindow = new BrowserWindow({
     ...panelBounds(displayForAssistant().workArea),
     alwaysOnTop: true,
-    backgroundColor: '#f7f6f1',
-    frame: false,
+    backgroundColor: '#00000000',
+    closable: true,
+    maximizable: false,
     minWidth: 340,
+    minimizable: true,
+    resizable: false,
     show: false,
     skipTaskbar: true,
     title: 'Loggie',
+    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'hidden',
+    trafficLightPosition: process.platform === 'darwin' ? { x: 14, y: 16 } : undefined,
+    transparent: true,
+    vibrancy: process.platform === 'darwin' ? 'sidebar' : undefined,
+    visualEffectState: process.platform === 'darwin' ? 'active' : undefined,
     webPreferences: commonWebPreferences(),
   });
   panelWindow.setAlwaysOnTop(true, 'floating');
   panelWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   lockDownRenderer(panelWindow);
   panelWindow.on('close', (event) => {
+    if (!isQuitting) {
+      event.preventDefault();
+      collapsePanel();
+    }
+  });
+  panelWindow.on('minimize', (event) => {
     if (!isQuitting) {
       event.preventDefault();
       collapsePanel();
