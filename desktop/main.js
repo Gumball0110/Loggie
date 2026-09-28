@@ -76,7 +76,7 @@ async function createCompanionWindow() {
     ...companionBounds(display.workArea, savedPosition),
     acceptFirstMouse: true,
     alwaysOnTop: true,
-    backgroundColor: '#f7f6f1',
+    backgroundColor: '#fff2cc',
     frame: false,
     hasShadow: false,
     resizable: false,

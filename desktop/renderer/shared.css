@@ -1,7 +1,7 @@
 :root {
   color-scheme: light;
-  --paper: #f7f6f1;
-  --surface: #fffef9;
+  --paper: #fff2cc;
+  --surface: #fffaf0;
   --ink: rgb(28 28 30);
   --muted: rgb(99 99 102);
   --tertiary: rgb(142 142 147);
@@ -56,7 +56,7 @@ button { cursor: pointer; }
 
 .panel-page { height: 100vh; color: var(--ink); background: var(--paper); font-family: var(--sans); overflow: hidden; -webkit-font-smoothing: antialiased; }
 .panel-shell { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; }
-.panel-header { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 12px 0 78px; border-bottom: .5px solid var(--line); background: #f1f0eb; }
+.panel-header { display: flex; align-items: center; justify-content: space-between; min-height: 52px; padding: 0 12px 0 78px; border-bottom: .5px solid var(--line); background: #f8e7b7; }
 .brand { display: flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 600; letter-spacing: 0; }
 .brand-mark { color: var(--pink); }
 .header-actions { display: flex; align-items: center; gap: 10px; }
@@ -88,7 +88,7 @@ kbd { min-width: 42px; padding: 3px 6px; border: .5px solid var(--line); border-
 .message.user { margin-left: auto; color: white; background: var(--blue); }
 .message.assistant { background: var(--surface); box-shadow: 0 0 0 .5px var(--line); }
 
-.composer { padding: 10px 12px 12px; border-top: .5px solid var(--line); background: #f1f0eb; }
+.composer { padding: 10px 12px 12px; border-top: .5px solid var(--line); background: #f8e7b7; }
 .input-row { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 7px; padding: 6px 6px 6px 10px; border: .5px solid rgb(60 60 67 / 28%); border-radius: 10px; background: rgb(255 255 255 / 86%); box-shadow: 0 1px 2px rgb(0 0 0 / 5%); }
 textarea { width: 100%; min-height: 28px; max-height: 100px; padding: 4px 0; resize: none; border: 0; outline: 0; color: var(--ink); background: transparent; font-size: 13px; line-height: 20px; }
 textarea::placeholder { color: var(--tertiary); }
