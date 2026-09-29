@@ -20,6 +20,7 @@
 html, body { margin: 0; min-height: 100%; }
 button, textarea { font: inherit; }
 button { cursor: pointer; }
+[hidden] { display: none !important; }
 
 .drag-region, .companion-page { -webkit-app-region: drag; }
 .no-drag, button, textarea { -webkit-app-region: no-drag; }
@@ -67,6 +68,10 @@ button { cursor: pointer; }
 .brand { display: flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 600; letter-spacing: 0; }
 .brand-mark { color: var(--pink); }
 .header-actions { display: flex; align-items: center; gap: 10px; }
+.connection-label { max-width: 180px; display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 10px; white-space: nowrap; }
+.connection-label > span:last-child { overflow: hidden; text-overflow: ellipsis; }
+.account-dot { flex: 0 0 auto; width: 7px; height: 7px; border-radius: 50%; background: var(--tertiary); }
+.connection-label.connected .account-dot { background: var(--green); }
 .status-dot { width: 8px; height: 8px; margin-right: 4px; border-radius: 50%; background: var(--green); box-shadow: inset 0 0 0 .5px rgb(0 0 0 / 16%); }
 .icon-button { width: 28px; height: 24px; padding: 0; border: 0; border-radius: 6px; color: var(--muted); background: transparent; font-size: 25px; line-height: 18px; }
 .icon-button:hover { color: var(--ink); background: rgb(120 120 128 / 12%); }
@@ -89,8 +94,35 @@ h1 { margin: 0; font-size: 26px; font-weight: 700; line-height: 1.2; letter-spac
 .row-copy strong { font-size: 13px; font-weight: 500; }
 .row-copy span { color: var(--muted); font-size: 11px; }
 kbd { min-width: 42px; padding: 3px 6px; border: 0; border-radius: 5px; color: var(--muted); background: #f5e8c5; box-shadow: 0 1px 2px rgb(112 82 18 / 10%); font: 11px var(--sans); text-align: center; }
-.connect-button { min-width: 62px; padding: 4px 10px; border: 0; border-radius: 6px; color: var(--tertiary); background: #f5e8c5; font-size: 12px; cursor: not-allowed; }
+.connect-button { min-width: 62px; padding: 4px 10px; border: 0; border-radius: 6px; color: var(--blue); background: #f5e8c5; font-size: 12px; }
+.connect-button:disabled { color: var(--tertiary); cursor: not-allowed; }
 .section-note { margin: 7px 10px 0; color: var(--tertiary); font-size: 11px; line-height: 1.4; }
+.authorization-card { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; margin-top: 18px; padding: 12px; border-radius: 10px; background: var(--surface); box-shadow: 0 1px 3px rgb(112 82 18 / 10%); }
+.authorization-card strong { font-size: 12px; }
+.authorization-card p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+.spinner { width: 18px; height: 18px; border: 2px solid #ead8a2; border-top-color: var(--pink); border-radius: 50%; animation: spin .8s linear infinite; }
+.notice { margin-top: 16px; padding: 10px 12px; border-radius: 8px; color: #8a304c; background: #ffe1e9; font-size: 12px; line-height: 1.45; }
+.notice.success { color: #286733; background: #e2f6df; }
+.notice.progress, .notice.empty { color: var(--muted); background: #f5e8c5; }
+.email-results, .thread-viewer { margin-top: 26px; }
+.section-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin: 0 8px 8px; }
+.section-heading h2, .thread-viewer h2 { margin: 0; font-size: 17px; line-height: 1.25; }
+.section-heading p { margin: 4px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; }
+.result-list, .thread-messages { display: grid; gap: 8px; }
+.result-card { width: 100%; display: grid; gap: 4px; padding: 12px; border: 0; border-radius: 10px; color: var(--ink); background: var(--surface); box-shadow: 0 1px 3px rgb(112 82 18 / 10%); text-align: left; }
+.result-card:hover { background: #fffdf7; box-shadow: 0 2px 6px rgb(112 82 18 / 14%); }
+.result-card strong { font-size: 13px; }
+.result-card span { overflow: hidden; color: var(--muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.result-card p { display: -webkit-box; margin: 2px 0 0; overflow: hidden; color: var(--muted); font-size: 11px; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.secondary-button { width: 100%; margin-top: 10px; padding: 7px; border: 0; border-radius: 7px; color: var(--blue); background: #f5e8c5; font-size: 12px; }
+.back-button { margin: 0 0 12px; padding: 0; border: 0; color: var(--blue); background: transparent; font-size: 12px; }
+.thread-participants { margin: 6px 0 14px; overflow: hidden; color: var(--muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.email-message { padding: 13px; border-radius: 10px; background: var(--surface); box-shadow: 0 1px 3px rgb(112 82 18 / 10%); }
+.email-message header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.email-message header strong { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.email-message time { flex: 0 0 auto; color: var(--tertiary); font-size: 9px; }
+.message-recipient { margin: 4px 0 10px; color: var(--tertiary); font-size: 9px; }
+.message-body { margin: 0; color: var(--ink); font-size: 12px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere; }
 .message { max-width: 88%; margin: 14px 0 0; padding: 8px 11px; border-radius: 12px; font-size: 13px; line-height: 1.45; }
 .message.user { margin-left: auto; color: white; background: var(--blue); }
 .message.assistant { background: var(--surface); box-shadow: 0 0 0 .5px var(--line); }
@@ -101,11 +133,14 @@ textarea { width: 100%; min-height: 28px; max-height: 100px; padding: 4px 0; res
 textarea::placeholder { color: var(--tertiary); }
 .send-button { width: 28px; height: 28px; padding: 0; border: 0; border-radius: 50%; color: white; background: var(--blue); font-size: 18px; font-weight: 600; line-height: 28px; }
 .send-button:hover { filter: brightness(.94); }
+.send-button:disabled { background: var(--tertiary); cursor: not-allowed; filter: none; }
 .composer-meta { display: flex; justify-content: space-between; margin: 7px 3px 0; color: var(--tertiary); font-size: 10px; }
 .text-button { padding: 0; border: 0; color: var(--blue); background: none; font: inherit; }
 .text-button:hover { color: var(--ink); }
 
+@keyframes spin { to { transform: rotate(360deg); } }
+
 @media (max-width: 370px) {
-  .connection { display: none; }
+  .connection-label { display: none; }
   .conversation { padding-inline: 18px; }
 }
