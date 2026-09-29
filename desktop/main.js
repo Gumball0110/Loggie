@@ -1,18 +1,29 @@
-import { app, BrowserWindow, globalShortcut, ipcMain, Menu, nativeImage, screen, Tray } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, Menu, nativeImage, safeStorage, screen, shell, Tray } from 'electron';
+import dotenv from 'dotenv';
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { GmailClient } from '../src/integrations/gmail/client.js';
+import { readGmailConfig } from '../src/integrations/gmail/config.js';
+import { GoogleOAuthClient } from '../src/integrations/gmail/oauth.js';
+import { createGmailService } from '../src/integrations/gmail/service.js';
+import { createCredentialStore } from '../src/security/credential-store.js';
+import { isTrustedRendererUrl, validateSearchRequest, validateThreadId } from './ipc-validation.js';
 import { companionBounds, panelBounds, shouldCollapsePanel, windowSizes } from './window-geometry.js';
 
 const desktopDirectory = dirname(fileURLToPath(import.meta.url));
+const projectDirectory = dirname(desktopDirectory);
 const positionFileName = 'window-state.json';
 const shortcut = 'CommandOrControl+Shift+L';
+
+dotenv.config({ path: join(projectDirectory, '.env'), quiet: true });
 
 let companionWindow;
 let panelWindow;
 let tray;
 let isQuitting = false;
 let saveTimer;
+let gmailService;
 
 app.setName('Loggie');
 
@@ -30,6 +41,10 @@ function preloadPath() {
 
 function statePath() {
   return join(app.getPath('userData'), positionFileName);
+}
+
+function credentialPath() {
+  return join(app.getPath('userData'), 'gmail-credentials.enc');
 }
 
 async function readSavedPosition() {
@@ -190,6 +205,29 @@ function createTray() {
   tray.on('click', togglePanel);
 }
 
+function assertTrustedRenderer(event) {
+  const source = event.senderFrame?.url || '';
+  if (!isTrustedRendererUrl(source)) {
+    throw new Error('Untrusted renderer request.');
+  }
+}
+
+function publicError(error) {
+  const message = error instanceof Error ? error.message : 'Something went wrong.';
+  return message.replace(/Bearer\s+[\w.-]+/gi, 'Bearer [hidden]').slice(0, 300);
+}
+
+function handleSecure(channel, handler) {
+  ipcMain.handle(channel, async (event, ...arguments_) => {
+    try {
+      assertTrustedRenderer(event);
+      return { ok: true, data: await handler(...arguments_) };
+    } catch (error) {
+      return { ok: false, error: publicError(error) };
+    }
+  });
+}
+
 function registerIpc() {
   ipcMain.handle('loggie:toggle-panel', () => togglePanel());
   ipcMain.handle('loggie:collapse-panel', () => collapsePanel());
@@ -198,18 +236,28 @@ function registerIpc() {
     companionWindow?.hide();
   });
   ipcMain.handle('loggie:quit', () => app.quit());
-  ipcMain.handle('loggie:submit-message', (_event, message) => {
-    if (typeof message !== 'string' || message.trim().length === 0 || message.length > 2000) {
-      throw new Error('Please enter a message shorter than 2,000 characters.');
-    }
-    return {
-      message: 'The desktop companion is ready. Gmail connection arrives in Milestone 2, so I haven\'t accessed or sent any email.',
-    };
+  handleSecure('gmail:status', () => gmailService.status());
+  handleSecure('gmail:connect', () => gmailService.connect());
+  handleSecure('gmail:cancel-connect', () => gmailService.cancelConnect());
+  handleSecure('gmail:disconnect', () => gmailService.disconnect());
+  handleSecure('gmail:search', (request) => {
+    const validated = validateSearchRequest(request);
+    return gmailService.search(validated.text, { limit: validated.limit, pageToken: validated.pageToken });
   });
+  handleSecure('gmail:get-thread', (threadId) => gmailService.getThread(validateThreadId(threadId)));
 }
 
 app.whenReady().then(async () => {
   if (process.platform === 'darwin') app.dock.hide();
+  const gmailConfig = readGmailConfig();
+  const credentialStore = createCredentialStore({ safeStorage, filePath: credentialPath() });
+  const oauth = new GoogleOAuthClient({
+    config: gmailConfig,
+    credentialStore,
+    openExternal: (url) => shell.openExternal(url),
+  });
+  const gmailClient = new GmailClient({ oauth });
+  gmailService = createGmailService({ oauth, client: gmailClient, configured: gmailConfig.configured });
   registerIpc();
   createTray();
   await createCompanionWindow();
