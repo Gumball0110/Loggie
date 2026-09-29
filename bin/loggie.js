@@ -72,6 +72,19 @@ if (args[0] === '--web') {
     else process.exit(code ?? 0);
   });
 } else {
+  if (process.env.LOGGIE_TUI === '1') {
+    if (args[0] === 'agy') {
+      const result = run(requireAgy(), args.slice(1), { cwd: process.cwd() });
+      process.exit(result.status ?? 0);
+    }
+    if (args[0] === 'claude') {
+      const result = run('claude', args.slice(1), { cwd: process.cwd() });
+      process.exit(result.status ?? 0);
+    }
+    console.log('Loggie is already running in this terminal.');
+    process.exit(0);
+  }
+
   const { startTui } = await import('../src/tui/app.js');
   let command;
   let commandArgs = [];

@@ -48,6 +48,22 @@ function eventIcon(event) {
   return statusIcon(event.status);
 }
 
+function mascotLines(width) {
+  const artWidth = 20;
+  const indent = ' '.repeat(Math.max(0, Math.floor((width - artWidth) / 2)));
+  const outline = (text) => style(text, { fg: palette.cyan, bold: true });
+  const face = (text) => style(text, { fg: palette.ink, bold: true });
+  return [
+    `${indent}     ${outline('╭╮   ╭╮')}   ${style('✦', { fg: palette.pink, bold: true })}`,
+    `${indent}   ${outline('╭─╯╰───╯╰─╮')}`,
+    `${indent}  ${outline('╱           ╲')}`,
+    `${indent} ${outline('│')}    ${face('●   ●')}    ${outline('│')}`,
+    `${indent} ${outline('│')}      ${face('ᴗ')}      ${outline('│')}  ${style('·', { fg: palette.lavender, bold: true })}`,
+    `${indent}  ${outline('╲           ╱')}`,
+    `${indent}   ${outline('╰─────────╯')}`,
+  ];
+}
+
 function panelLines(state, width, height) {
   const inner = Math.max(1, width - 2);
   const lines = [];
@@ -136,7 +152,9 @@ function panelLines(state, width, height) {
     const result = isRunning ? 'running' : `exit ${state.exitCode ?? '-'}`;
     technical.push(lineColumns(chip(`${state.risk.toUpperCase()} RISK`, state.risk), style(`${result}${duration ? ` · ${duration}` : ''}`, { fg: palette.muted }), inner));
   }
-  while (lines.length + technical.length < height) lines.push('');
+  const mascot = height >= 18 && width >= 28 ? mascotLines(inner) : [];
+  while (lines.length + mascot.length + technical.length < height) lines.push('');
+  if (lines.length + mascot.length + technical.length <= height) lines.push(...mascot);
   lines.push(...technical);
   return lines.slice(0, height).map((line) => panelLine(` ${line}`, width));
 }
