@@ -59,6 +59,7 @@ button { cursor: pointer; }
   transform: scale(1.55);
   pointer-events: none;
 }
+.mascot-button[data-state='sleeping'] .mascot-stage { transform: scale(1.85); }
 .mascot-image {
   display: block;
   width: 100%;
