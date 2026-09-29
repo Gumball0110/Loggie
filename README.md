@@ -17,7 +17,7 @@ npm install
 npm link
 ```
 
-## Desktop companion (Milestone 1)
+## Desktop companion
 
 Launch the standalone desktop app:
 
@@ -29,7 +29,51 @@ A floating Loggie mascot appears above your ordinary app windows. Click it to op
 
 The mascot can be dragged and its position is restored after restart. Use **hide Loggie** in the panel to hide both windows; the menu bar icon and keyboard shortcut remain available. Use **Quit Loggie** in the menu bar menu to stop the app.
 
-This milestone intentionally does not connect Gmail or call OpenAI yet. The text box returns a clear setup message instead of simulating email access. Your existing `.env` file stays local and is ignored by Git; it will be used by the agent milestone later.
+The desktop app includes read-only Gmail integration. It can connect one Google account, search conversations, and display complete threads. It cannot draft or send email.
+
+## Gmail setup (Milestone 2)
+
+Loggie uses Google's installed desktop OAuth flow with PKCE and a temporary loopback callback. Tokens are encrypted with Electron secure storage (macOS Keychain-backed) and never enter the renderer.
+
+1. Open [Google Cloud Console](https://console.cloud.google.com/) and create or select a project.
+2. Open **APIs & Services → Library**, find **Gmail API**, and enable it.
+3. Open **Google Auth Platform → Branding** and configure the app name and support email.
+4. Under **Audience**, choose **External** for a personal Gmail account. Keep the app in testing and add your Gmail address under **Test users**.
+5. Under **Data Access**, add only `https://www.googleapis.com/auth/gmail.readonly`.
+6. Under **Clients**, create an OAuth client with application type **Desktop app**.
+7. Copy the safe template and add the client values from Google:
+
+```bash
+cp .env.example .env
+```
+
+```dotenv
+GOOGLE_OAUTH_CLIENT_ID=your-client-id.apps.googleusercontent.com
+GOOGLE_OAUTH_CLIENT_SECRET=your-desktop-client-secret
+```
+
+Do not commit `.env`; it is already ignored by Git. Google recommends loopback redirects for macOS desktop apps and PKCE for installed apps. See Google's [desktop OAuth documentation](https://developers.google.com/identity/protocols/oauth2/native-app) and [Gmail scope documentation](https://developers.google.com/workspace/gmail/api/auth/scopes).
+
+Restart Loggie after changing `.env`:
+
+```bash
+npm run desktop
+```
+
+Click **Connect**, complete authorization in the system browser, and return to Loggie. If Google reports that the app is unavailable to you, confirm your Gmail address is listed as a test user. Do not use a Web application OAuth client; Loggie expects a Desktop app client.
+
+### Manual Gmail test checklist
+
+1. Launch Loggie and confirm Gmail initially shows **Not connected**.
+2. Click **Connect**, approve the single read-only Gmail permission in the system browser, and confirm the connected address appears.
+3. Search `Find Daniel's latest email` and confirm real matching conversations appear.
+4. Search `Find the email about Thursday's lab meeting` and confirm topic search works.
+5. If multiple conversations appear, select the intended result.
+6. Confirm the full thread shows sender, recipients, timestamps, subject, and message text.
+7. Disconnect Gmail and confirm searching becomes unavailable.
+8. Restart Loggie and confirm the disconnected state persists.
+
+Loggie does not monitor Gmail in the background. Email content is shown as inert text and is never treated as an instruction. Milestone 2 does not send, modify, archive, or delete email.
 
 Quick desktop verification:
 
@@ -50,7 +94,6 @@ The smoke check opens both secure Electron renderer pages, then quits automatica
 
 ### Not implemented yet
 
-- Milestone 2: Google OAuth, secure credential storage, and read-only Gmail search/thread retrieval.
 - Milestone 3: OpenAI-powered intent handling and draft generation.
 - Milestone 4: editable approval flow and Gmail sending.
 - Milestone 5: full end-to-end tests, packaging, and final documentation.
