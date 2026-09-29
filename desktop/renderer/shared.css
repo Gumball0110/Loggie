@@ -71,7 +71,7 @@ button { cursor: pointer; }
 .mascot-button[data-state='idle'] .mascot-image { animation: mascot-breathe 3s ease-in-out infinite; }
 .mascot-button[data-state='sleeping'] .mascot-image { animation: none; }
 .mascot-button[data-state='happy'] .mascot-image { animation: mascot-happy .2s ease-out 1; }
-.mascot-button[data-state='excited'] .mascot-image { animation: mascot-press .16s ease-in-out 1; }
+.mascot-button[data-state='excited'] .mascot-image { animation: mascot-press .12s ease-out 1; }
 
 @keyframes mascot-breathe {
   0%, 100% { transform: scale(1); }
