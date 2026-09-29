@@ -2,7 +2,7 @@ import { app, BrowserWindow, globalShortcut, ipcMain, Menu, nativeImage, screen,
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { companionBounds, panelBounds } from './window-geometry.js';
+import { companionBounds, panelBounds, shouldCollapsePanel } from './window-geometry.js';
 
 const desktopDirectory = dirname(fileURLToPath(import.meta.url));
 const positionFileName = 'window-state.json';
@@ -15,6 +15,10 @@ let isQuitting = false;
 let saveTimer;
 
 app.setName('Loggie');
+
+if (!app.requestSingleInstanceLock()) {
+  app.exit(0);
+}
 
 function rendererPath(fileName) {
   return join(desktopDirectory, 'renderer', fileName);
@@ -113,9 +117,9 @@ async function createPanelWindow() {
     closable: true,
     frame: false,
     maximizable: false,
-    minWidth: 340,
+    minWidth: 260,
     minimizable: true,
-    resizable: false,
+    resizable: true,
     show: false,
     skipTaskbar: true,
     title: 'Loggie',
@@ -134,6 +138,11 @@ async function createPanelWindow() {
   panelWindow.on('minimize', (event) => {
     if (!isQuitting) {
       event.preventDefault();
+      collapsePanel();
+    }
+  });
+  panelWindow.on('resize', () => {
+    if (panelWindow?.isVisible() && shouldCollapsePanel(panelWindow.getBounds().width)) {
       collapsePanel();
     }
   });
@@ -159,6 +168,8 @@ async function togglePanel() {
   if (panelWindow?.isVisible()) collapsePanel();
   else await expandPanel();
 }
+
+app.on('second-instance', () => togglePanel());
 
 function createTrayImage() {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"><path fill="black" d="M4 5.2 6.2 3l1.5 2h2.6l1.5-2L14 5.2v6.6c0 2-1.7 3.7-3.7 3.7H7.7A3.7 3.7 0 0 1 4 11.8V5.2Z"/><circle fill="white" cx="7" cy="9" r="1"/><circle fill="white" cx="11" cy="9" r="1"/></svg>`;
@@ -214,6 +225,18 @@ app.whenReady().then(async () => {
     );
     if (!bridgeReady) {
       console.error('Desktop smoke test failed: the secure renderer bridge did not load.');
+      process.exitCode = 1;
+    }
+    await expandPanel();
+    const bounds = assistant.getBounds();
+    assistant.setBounds({
+      ...bounds,
+      x: bounds.x + bounds.width - 280,
+      width: 280,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    if (assistant.isVisible() || !companionWindow.isVisible()) {
+      console.error('Desktop smoke test failed: edge resizing did not collapse the panel.');
       process.exitCode = 1;
     }
     setTimeout(() => app.quit(), 500);

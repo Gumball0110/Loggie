@@ -2,6 +2,7 @@ const COMPANION_SIZE = 112;
 const PANEL_WIDTH_RATIO = 0.25;
 const PANEL_MIN_WIDTH = 340;
 const PANEL_MAX_WIDTH = 460;
+const PANEL_DISMISS_WIDTH = 280;
 
 export function clamp(value, minimum, maximum) {
   return Math.min(Math.max(value, minimum), Math.max(minimum, maximum));
@@ -38,8 +39,13 @@ export function panelBounds(workArea) {
   };
 }
 
+export function shouldCollapsePanel(width) {
+  return Number.isFinite(width) && width <= PANEL_DISMISS_WIDTH;
+}
+
 export const windowSizes = {
   companion: COMPANION_SIZE,
   panelMinimum: PANEL_MIN_WIDTH,
   panelMaximum: PANEL_MAX_WIDTH,
+  panelDismiss: PANEL_DISMISS_WIDTH,
 };
