@@ -84,10 +84,11 @@ function finishGesture(event) {
   clearTimeout(excitedTimer);
   excited = true;
   renderState();
-  excitedTimer = setTimeout(() => {
+  excitedTimer = setTimeout(async () => {
+    await window.loggie.togglePanel();
     excited = false;
-    renderState();
-    window.loggie.togglePanel();
+    hovering = false;
+    scheduleSleep();
   }, excitedDuration);
 }
 
