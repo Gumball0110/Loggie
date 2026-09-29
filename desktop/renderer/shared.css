@@ -70,20 +70,20 @@ button { cursor: pointer; }
 }
 .mascot-button[data-state='idle'] .mascot-image { animation: mascot-breathe 3s ease-in-out infinite; }
 .mascot-button[data-state='sleeping'] .mascot-image { animation: none; }
-.mascot-button[data-state='happy'] .mascot-image { animation: mascot-happy .5s ease-in-out infinite alternate; }
-.mascot-button[data-state='excited'] .mascot-image { animation: mascot-jump .45s ease-in-out; }
+.mascot-button[data-state='happy'] .mascot-image { animation: mascot-happy .2s ease-out 1; }
+.mascot-button[data-state='excited'] .mascot-image { animation: mascot-press .16s ease-in-out 1; }
 
 @keyframes mascot-breathe {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.03); }
 }
 @keyframes mascot-happy {
-  from { transform: rotate(-3deg) translateY(0); }
-  to { transform: rotate(3deg) translateY(-2px); }
+  0%, 100% { transform: rotate(0); }
+  45% { transform: rotate(4deg); }
 }
-@keyframes mascot-jump {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+@keyframes mascot-press {
+  0%, 100% { transform: scale(1); }
+  45% { transform: scale(.94); }
 }
 
 @media (prefers-reduced-motion: reduce) {

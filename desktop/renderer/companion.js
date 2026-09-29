@@ -3,7 +3,7 @@ import { mascotAssetPaths, resolveMascotState } from './mascot-state.js';
 const mascot = document.querySelector('#openLoggie');
 const mascotImage = document.querySelector('#mascotImage');
 const dragThreshold = 4;
-const excitedDuration = 450;
+const excitedDuration = 160;
 const sleepDelay = 60_000;
 let gesture = null;
 let hovering = false;
