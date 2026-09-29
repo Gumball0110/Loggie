@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
-import { isTrustedRendererUrl, validateSearchRequest, validateThreadId } from '../desktop/ipc-validation.js';
+import { isTrustedRendererUrl, validateCompanionPosition, validateSearchRequest, validateThreadId } from '../desktop/ipc-validation.js';
 
 test('accepts only local desktop renderer IPC senders', () => {
   assert.equal(isTrustedRendererUrl('file:///project/desktop/renderer/panel.html'), true);
@@ -12,6 +12,11 @@ test('validates renderer search and thread arguments', () => {
   assert.deepEqual(validateSearchRequest({ text: 'Find Daniel', limit: 999, pageToken: '../bad' }), { text: 'Find Daniel', limit: 20, pageToken: null });
   assert.equal(validateThreadId('thread-123'), 'thread-123');
   assert.throws(() => validateThreadId('../secret'), /Invalid/);
+});
+
+test('validates and rounds companion window positions', () => {
+  assert.deepEqual(validateCompanionPosition({ x: -100.4, y: 42.7 }), { x: -100, y: 43 });
+  assert.throws(() => validateCompanionPosition({ x: 'not-a-position', y: 10 }), /Invalid/);
 });
 
 test('renders email as text and exposes no token APIs to the renderer', async () => {

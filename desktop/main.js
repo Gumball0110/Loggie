@@ -8,7 +8,7 @@ import { readGmailConfig } from '../src/integrations/gmail/config.js';
 import { GoogleOAuthClient } from '../src/integrations/gmail/oauth.js';
 import { createGmailService } from '../src/integrations/gmail/service.js';
 import { createCredentialStore } from '../src/security/credential-store.js';
-import { isTrustedRendererUrl, validateSearchRequest, validateThreadId } from './ipc-validation.js';
+import { isTrustedRendererUrl, validateCompanionPosition, validateSearchRequest, validateThreadId } from './ipc-validation.js';
 import { companionBounds, panelBounds, shouldCollapsePanel, windowSizes } from './window-geometry.js';
 
 const desktopDirectory = dirname(fileURLToPath(import.meta.url));
@@ -236,6 +236,14 @@ function registerIpc() {
     companionWindow?.hide();
   });
   ipcMain.handle('loggie:quit', () => app.quit());
+  ipcMain.on('loggie:move-companion', (event, position) => {
+    assertTrustedRenderer(event);
+    if (!companionWindow || companionWindow.isDestroyed()) return;
+    const requested = validateCompanionPosition(position);
+    const display = screen.getDisplayNearestPoint(requested);
+    const bounds = companionBounds(display.workArea, requested);
+    companionWindow.setPosition(bounds.x, bounds.y, false);
+  });
   handleSecure('gmail:status', () => gmailService.status());
   handleSecure('gmail:connect', () => gmailService.connect());
   handleSecure('gmail:cancel-connect', () => gmailService.cancelConnect());

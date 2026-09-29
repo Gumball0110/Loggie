@@ -17,3 +17,12 @@ export function validateThreadId(threadId) {
   if (typeof threadId !== 'string' || !/^[\w-]{1,200}$/.test(threadId)) throw new Error('Invalid Gmail thread.');
   return threadId;
 }
+
+export function validateCompanionPosition(position) {
+  const x = Number(position?.x);
+  const y = Number(position?.y);
+  if (!Number.isFinite(x) || !Number.isFinite(y)) {
+    throw new Error('Invalid companion position.');
+  }
+  return { x: Math.round(x), y: Math.round(y) };
+}

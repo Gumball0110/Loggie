@@ -46,6 +46,7 @@ button { cursor: pointer; }
   box-shadow: none;
   filter: none;
   outline: none;
+  touch-action: none;
 }
 .mascot-button:focus,
 .mascot-button:focus-visible,

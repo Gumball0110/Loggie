@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld('loggie', Object.freeze({
   collapsePanel: () => ipcRenderer.invoke('loggie:collapse-panel'),
   hide: () => ipcRenderer.invoke('loggie:hide'),
   quit: () => ipcRenderer.invoke('loggie:quit'),
+  moveCompanion: (position) => ipcRenderer.send('loggie:move-companion', position),
   gmail: Object.freeze({
     status: () => ipcRenderer.invoke('gmail:status'),
     connect: () => ipcRenderer.invoke('gmail:connect'),
