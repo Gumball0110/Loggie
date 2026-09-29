@@ -282,6 +282,21 @@ app.whenReady().then(async () => {
   }
 
   if (process.env.LOGGIE_DESKTOP_SMOKE_TEST === '1') {
+    const mascotReady = await companionWindow.webContents.executeJavaScript(`
+      new Promise((resolve) => {
+        const image = document.querySelector('#mascotImage');
+        const verify = () => resolve(Boolean(
+          image?.naturalWidth > 0 &&
+          document.querySelector('#openLoggie')?.dataset.state === 'idle'
+        ));
+        if (image?.complete) verify();
+        else image?.addEventListener('load', verify, { once: true });
+      })
+    `);
+    if (!mascotReady) {
+      console.error('Desktop smoke test failed: the idle mascot asset did not load.');
+      process.exitCode = 1;
+    }
     const assistant = await createPanelWindow();
     const bridgeReady = await assistant.webContents.executeJavaScript(
       'typeof window.loggie?.collapsePanel === "function"',

@@ -8,6 +8,7 @@
   },
   "files": [
     "antigravity-plugin",
+    "assets",
     "bin",
     "desktop",
     "hooks",
