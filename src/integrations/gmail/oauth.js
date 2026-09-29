@@ -84,7 +84,9 @@ export class GoogleOAuthClient {
   }
 
   assertConfigured() {
-    if (!this.config?.clientId) throw new Error('Google OAuth is not configured. Add GOOGLE_OAUTH_CLIENT_ID to your .env file.');
+    if (!this.config?.clientId) {
+      throw new Error('Google OAuth is not configured. Add Desktop app credentials at credentials/google-oauth.json and restart Loggie.');
+    }
   }
 
   async connect() {

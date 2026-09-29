@@ -34,7 +34,7 @@ function renderAccount(account = null, configured = true) {
   elements.connectGmail.disabled = !configured || state.connecting;
   elements.accountNote.textContent = configured
     ? state.connected ? 'Loggie can only read email you ask for. It cannot send messages.' : 'Loggie requests read-only Gmail access and cannot send email.'
-    : 'Add your Google Desktop OAuth client ID to .env, then restart Loggie.';
+    : 'Place your Desktop OAuth JSON at credentials/google-oauth.json, then restart Loggie.';
   elements.message.disabled = !state.connected || state.searching;
   elements.searchButton.disabled = !state.connected || state.searching;
   elements.composerHint.textContent = state.connected ? 'Gmail read-only · no sending' : 'Connect Gmail to search';

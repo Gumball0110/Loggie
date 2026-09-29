@@ -1,4 +1,17 @@
+
+# Dependencies
 node_modules/
+
+# Logs
 *.log
+
+# macOS
 .DS_Store
+
+# Environment variables
 .env
+.env.*
+!.env.example
+
+# Google OAuth credentials
+credentials/

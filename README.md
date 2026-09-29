@@ -41,20 +41,17 @@ Loggie uses Google's installed desktop OAuth flow with PKCE and a temporary loop
 4. Under **Audience**, choose **External** for a personal Gmail account. Keep the app in testing and add your Gmail address under **Test users**.
 5. Under **Data Access**, add only `https://www.googleapis.com/auth/gmail.readonly`.
 6. Under **Clients**, create an OAuth client with application type **Desktop app**.
-7. Copy the safe template and add the client values from Google:
+7. Download the client JSON from Google and save it at this exact local path:
 
 ```bash
-cp .env.example .env
+mkdir -p credentials
+# Move the downloaded file to:
+# credentials/google-oauth.json
 ```
 
-```dotenv
-GOOGLE_OAUTH_CLIENT_ID=your-client-id.apps.googleusercontent.com
-GOOGLE_OAUTH_CLIENT_SECRET=your-desktop-client-secret
-```
+Do not copy the client secret into renderer code. Both `credentials/` and `.env` are ignored by Git. Loggie reads the Desktop client file only in Electron's main process. Google recommends loopback redirects for macOS desktop apps and PKCE for installed apps. See Google's [desktop OAuth documentation](https://developers.google.com/identity/protocols/oauth2/native-app) and [Gmail scope documentation](https://developers.google.com/workspace/gmail/api/auth/scopes).
 
-Do not commit `.env`; it is already ignored by Git. Google recommends loopback redirects for macOS desktop apps and PKCE for installed apps. See Google's [desktop OAuth documentation](https://developers.google.com/identity/protocols/oauth2/native-app) and [Gmail scope documentation](https://developers.google.com/workspace/gmail/api/auth/scopes).
-
-Restart Loggie after changing `.env`:
+Restart Loggie after adding the credentials file:
 
 ```bash
 npm run desktop

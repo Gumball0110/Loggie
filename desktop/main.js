@@ -249,7 +249,9 @@ function registerIpc() {
 
 app.whenReady().then(async () => {
   if (process.platform === 'darwin') app.dock.hide();
-  const gmailConfig = readGmailConfig();
+  const gmailConfig = readGmailConfig({
+    credentialsPath: join(projectDirectory, 'credentials', 'google-oauth.json'),
+  });
   const credentialStore = createCredentialStore({ safeStorage, filePath: credentialPath() });
   const oauth = new GoogleOAuthClient({
     config: gmailConfig,
@@ -257,7 +259,12 @@ app.whenReady().then(async () => {
     openExternal: (url) => shell.openExternal(url),
   });
   const gmailClient = new GmailClient({ oauth });
-  gmailService = createGmailService({ oauth, client: gmailClient, configured: gmailConfig.configured });
+  gmailService = createGmailService({
+    oauth,
+    client: gmailClient,
+    configured: gmailConfig.configured,
+    configurationError: gmailConfig.configurationError,
+  });
   registerIpc();
   createTray();
   await createCompanionWindow();

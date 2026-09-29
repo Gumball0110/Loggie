@@ -1,13 +1,15 @@
 import { parseNaturalLanguageSearch } from './query-parser.js';
 
-export function createGmailService({ oauth, client, configured }) {
+export function createGmailService({ oauth, client, configured, configurationError = null }) {
   return {
     configuration() {
       return { configured };
     },
 
     async status() {
-      if (!configured) return { configured: false, connected: false, account: null };
+      if (!configured) {
+        return { configured: false, connected: false, account: null, error: configurationError };
+      }
       try {
         const account = await client.getProfile();
         return { configured: true, connected: true, account };
