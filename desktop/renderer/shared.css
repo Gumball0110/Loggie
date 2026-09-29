@@ -34,6 +34,8 @@ button { cursor: pointer; }
 }
 
 .mascot-button {
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
   width: 92px;
   height: 92px;
   padding: 0;
@@ -42,7 +44,11 @@ button { cursor: pointer; }
   background: transparent;
   box-shadow: none;
   filter: none;
+  outline: none;
 }
+.mascot-button:focus,
+.mascot-button:focus-visible,
+.mascot-button:active { box-shadow: none; outline: none; }
 
 .mascot { position: relative; display: block; width: 84px; height: 70px; margin: 11px 4px; border: 3px solid var(--ink); border-radius: 29px 29px 33px 33px; background: var(--cyan); transition: transform 160ms ease; }
 .mascot-button:hover .mascot { transform: translateY(-3px) rotate(2deg); }
