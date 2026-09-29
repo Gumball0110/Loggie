@@ -109,8 +109,9 @@ async function createPanelWindow() {
   panelWindow = new BrowserWindow({
     ...panelBounds(displayForAssistant().workArea),
     alwaysOnTop: true,
-    backgroundColor: '#00000000',
+    backgroundColor: '#fff2cc',
     closable: true,
+    frame: false,
     maximizable: false,
     minWidth: 340,
     minimizable: true,
@@ -118,8 +119,6 @@ async function createPanelWindow() {
     show: false,
     skipTaskbar: true,
     title: 'Loggie',
-    titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'hidden',
-    trafficLightPosition: process.platform === 'darwin' ? { x: 14, y: 16 } : undefined,
     transparent: false,
     webPreferences: commonWebPreferences(),
   });
