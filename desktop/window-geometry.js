@@ -2,7 +2,7 @@ const COMPANION_SIZE = 112;
 const PANEL_WIDTH_RATIO = 0.25;
 const PANEL_MIN_WIDTH = 340;
 const PANEL_MAX_WIDTH = 460;
-const PANEL_DISMISS_WIDTH = 280;
+const PANEL_DISMISS_WIDTH = 72;
 
 export function clamp(value, minimum, maximum) {
   return Math.min(Math.max(value, minimum), Math.max(minimum, maximum));

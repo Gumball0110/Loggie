@@ -2,7 +2,7 @@ import { app, BrowserWindow, globalShortcut, ipcMain, Menu, nativeImage, screen,
 import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { companionBounds, panelBounds, shouldCollapsePanel } from './window-geometry.js';
+import { companionBounds, panelBounds, shouldCollapsePanel, windowSizes } from './window-geometry.js';
 
 const desktopDirectory = dirname(fileURLToPath(import.meta.url));
 const positionFileName = 'window-state.json';
@@ -117,7 +117,7 @@ async function createPanelWindow() {
     closable: true,
     frame: false,
     maximizable: false,
-    minWidth: 260,
+    minWidth: 64,
     minimizable: true,
     resizable: true,
     show: false,
@@ -231,8 +231,8 @@ app.whenReady().then(async () => {
     const bounds = assistant.getBounds();
     assistant.setBounds({
       ...bounds,
-      x: bounds.x + bounds.width - 280,
-      width: 280,
+      x: bounds.x + bounds.width - windowSizes.panelDismiss,
+      width: windowSizes.panelDismiss,
     });
     await new Promise((resolve) => setTimeout(resolve, 100));
     if (assistant.isVisible() || !companionWindow.isVisible()) {

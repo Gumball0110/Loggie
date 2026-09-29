@@ -18,7 +18,7 @@ test('restores the companion inside the visible display', () => {
 });
 
 test('collapses the panel after it is dragged past the dismiss threshold', () => {
-  assert.equal(shouldCollapsePanel(281), false);
-  assert.equal(shouldCollapsePanel(280), true);
-  assert.equal(shouldCollapsePanel(260), true);
+  assert.equal(shouldCollapsePanel(73), false);
+  assert.equal(shouldCollapsePanel(72), true);
+  assert.equal(shouldCollapsePanel(64), true);
 });
