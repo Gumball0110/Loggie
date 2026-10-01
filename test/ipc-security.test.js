@@ -25,3 +25,14 @@ test('renders email as text and exposes no token APIs to the renderer', async ()
   assert.doesNotMatch(renderer, /innerHTML|insertAdjacentHTML/);
   assert.doesNotMatch(preload, /accessToken|refreshToken|credential/);
 });
+
+test('exposes scoped core actions without direct database or socket access', async () => {
+  const preload = await readFile(new URL('../desktop/preload.cjs', import.meta.url), 'utf8');
+  assert.match(preload, /core:\s*Object\.freeze/);
+  assert.match(preload, /core:list-projects/);
+  assert.match(preload, /core:list-tasks/);
+  assert.match(preload, /core:create-task/);
+  assert.match(preload, /core:prepare-task/);
+  assert.match(preload, /core:start-task/);
+  assert.doesNotMatch(preload, /databasePath|socketPath|transitionTask/);
+});

@@ -17,3 +17,12 @@ test('does not open another TUI inside an existing Loggie session', () => {
   assert.equal(result.stdout.trim(), 'Loggie is already running in this terminal.');
   assert.doesNotMatch(result.stderr, /needs an interactive terminal/i);
 });
+
+test('requires a value for the task option before starting the TUI', () => {
+  const result = spawnSync(process.execPath, [join(projectRoot, 'bin/loggie.js'), '--task'], {
+    encoding: 'utf8',
+    env: { ...process.env, LOGGIE_TUI: '' },
+  });
+  assert.equal(result.status, 2);
+  assert.match(result.stderr, /loggie --task <task-id>/);
+});

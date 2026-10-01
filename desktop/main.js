@@ -1,6 +1,6 @@
 import { app, BrowserWindow, globalShortcut, ipcMain, Menu, nativeImage, safeStorage, screen, shell, Tray } from 'electron';
 import dotenv from 'dotenv';
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, stat, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { GmailClient } from '../src/integrations/gmail/client.js';
@@ -8,8 +8,11 @@ import { readGmailConfig } from '../src/integrations/gmail/config.js';
 import { GoogleOAuthClient } from '../src/integrations/gmail/oauth.js';
 import { createGmailService } from '../src/integrations/gmail/service.js';
 import { createCredentialStore } from '../src/security/credential-store.js';
+import { ensureCoordinator } from '../src/core/runtime.js';
 import { isTrustedRendererUrl, validateCompanionPosition, validateSearchRequest, validateThreadId } from './ipc-validation.js';
 import { companionBounds, panelBounds, shouldCollapsePanel, windowSizes } from './window-geometry.js';
+import { launchTaskTerminal } from './task-launcher.js';
+import { createCommandService } from './command-service.js';
 
 const desktopDirectory = dirname(fileURLToPath(import.meta.url));
 const projectDirectory = dirname(desktopDirectory);
@@ -24,6 +27,10 @@ let tray;
 let isQuitting = false;
 let saveTimer;
 let gmailService;
+let coreClient;
+let commandService;
+let coreEventTimer;
+let lastCoreEventSequence = 0;
 
 app.setName('Loggie');
 
@@ -253,10 +260,65 @@ function registerIpc() {
     return gmailService.search(validated.text, { limit: validated.limit, pageToken: validated.pageToken });
   });
   handleSecure('gmail:get-thread', (threadId) => gmailService.getThread(validateThreadId(threadId)));
+  handleSecure('core:health', () => coreClient.health());
+  handleSecure('core:list-projects', () => coreClient.listProjects());
+  handleSecure('core:list-tasks', (filters = {}) => coreClient.listTasks({
+    status: typeof filters.status === 'string' ? filters.status : undefined,
+    projectId: typeof filters.projectId === 'string' ? filters.projectId : undefined,
+  }));
+  handleSecure('core:list-sessions', (filters = {}) => coreClient.listSessions({
+    status: typeof filters.status === 'string' ? filters.status : undefined,
+    taskId: typeof filters.taskId === 'string' ? filters.taskId : undefined,
+  }));
+  handleSecure('core:create-project', (project) => coreClient.createProject(project));
+  handleSecure('core:create-task', (task) => coreClient.createTask(task));
+  handleSecure('core:prepare-task', async (taskId) => {
+    const task = await coreClient.getTask(taskId);
+    if (task.status !== 'waiting') throw new Error('Only waiting tasks can be prepared.');
+    const brief = await coreClient.createBrief(taskId, {
+      objective: task.title,
+      context: task.description,
+      completionCriteria: ['Complete the requested work and verify the result.'],
+    });
+    await coreClient.approveBrief(brief.id);
+    return coreClient.transitionTask(taskId, 'briefed', 'Brief approved in Loggie');
+  });
+  handleSecure('core:start-task', async (taskId) => {
+    const task = await coreClient.getTask(taskId);
+    if (task.status !== 'briefed') throw new Error('Prepare this task before starting it.');
+    if (!task.projectId) throw new Error('Task needs a project before it can start.');
+    const project = await coreClient.getProject(task.projectId);
+    const directory = project.directoryPath ? await stat(project.directoryPath).catch(() => null) : null;
+    if (!directory?.isDirectory()) throw new Error('Project folder does not exist or is not a directory.');
+    return launchTaskTerminal({ directoryPath: project.directoryPath, taskId, cliPath: join(projectDirectory, 'bin', 'loggie.js') });
+  });
+  handleSecure('command:execute', (text) => commandService.execute(text));
+  handleSecure('command:open-resolved', (selection) => commandService.openResolved(selection));
+}
+
+function startCoreEventPolling() {
+  const poll = async () => {
+    try {
+      const events = await coreClient.listEvents(lastCoreEventSequence);
+      if (events.length) {
+        lastCoreEventSequence = events.at(-1).sequence;
+        if (panelWindow && !panelWindow.isDestroyed()) panelWindow.webContents.send('core:events', events);
+      }
+    } catch (error) {
+      console.error(`Could not read Loggie core events: ${error.message}`);
+    }
+  };
+  poll();
+  coreEventTimer = setInterval(poll, 500);
+  coreEventTimer.unref?.();
 }
 
 app.whenReady().then(async () => {
   if (process.platform === 'darwin') app.dock.hide();
+  coreClient = await ensureCoordinator({
+    dataDirectory: join(app.getPath('userData'), 'core'),
+  });
+  commandService = createCommandService({ coreClient, shell });
   const gmailConfig = readGmailConfig({
     credentialsPath: join(projectDirectory, 'credentials', 'google-oauth.json'),
   });
@@ -274,6 +336,7 @@ app.whenReady().then(async () => {
     configurationError: gmailConfig.configurationError,
   });
   registerIpc();
+  startCoreEventPolling();
   createTray();
   await createCompanionWindow();
 
@@ -305,6 +368,20 @@ app.whenReady().then(async () => {
       console.error('Desktop smoke test failed: the secure renderer bridge did not load.');
       process.exitCode = 1;
     }
+    await new Promise((resolve) => setTimeout(resolve, 150));
+    const coreUiReady = await assistant.webContents.executeJavaScript(`Boolean(
+      document.querySelector('#commandHistory') &&
+      document.querySelector('#message') &&
+      typeof window.loggie?.command?.execute === 'function'
+    )`);
+    if (!coreUiReady) {
+      console.error('Desktop smoke test failed: the command-first interface did not load.');
+      process.exitCode = 1;
+    }
+    if (process.env.LOGGIE_DESKTOP_SMOKE_SCREENSHOT) {
+      const image = await assistant.webContents.capturePage();
+      await writeFile(process.env.LOGGIE_DESKTOP_SMOKE_SCREENSHOT, image.toPNG());
+    }
     await expandPanel();
     const bounds = assistant.getBounds();
     assistant.setBounds({
@@ -329,6 +406,7 @@ app.on('activate', () => {
 app.on('before-quit', () => {
   isQuitting = true;
   clearTimeout(saveTimer);
+  clearInterval(coreEventTimer);
 });
 
 app.on('will-quit', () => globalShortcut.unregisterAll());

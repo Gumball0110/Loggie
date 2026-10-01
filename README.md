@@ -31,6 +31,8 @@ The mascot can be dragged and its position is restored after restart. Use **hide
 
 The desktop app includes read-only Gmail integration. It can connect one Google account, search conversations, and display complete threads. It cannot draft or send email.
 
+The desktop uses a command-first interface. Ask Loggie to open a local file, folder, or project in Visual Studio Code, Finder, Terminal, or its default app—for example, `Open AI Terminal Tool in VS Code`. Loggie searches known projects plus Documents, Desktop, and Downloads; it opens a unique match directly and asks you to choose when names are ambiguous. Commands run locally and structured process arguments are used instead of passing natural language to a shell.
+
 ## Gmail setup (Milestone 2)
 
 Loggie uses Google's installed desktop OAuth flow with PKCE and a temporary loopback callback. Tokens are encrypted with Electron secure storage (macOS Keychain-backed) and never enter the renderer.

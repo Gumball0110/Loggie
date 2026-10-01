@@ -8,6 +8,16 @@ import { dirname, join } from 'node:path';
 
 const projectRoot = dirname(dirname(fileURLToPath(import.meta.url)));
 const args = process.argv.slice(2);
+let taskId = null;
+const taskIndex = args.indexOf('--task');
+if (taskIndex >= 0) {
+  taskId = args[taskIndex + 1];
+  if (!taskId || taskId.startsWith('-')) {
+    console.error('Usage: loggie --task <task-id>');
+    process.exit(2);
+  }
+  args.splice(taskIndex, 2);
+}
 const agyCandidates = [process.env.AGY_BIN, join(process.env.HOME || '', '.local/bin/agy'), 'agy'].filter(Boolean);
 let agy = null;
 for (const candidate of agyCandidates) {
@@ -97,7 +107,7 @@ if (args[0] === '--web') {
   }
 
   try {
-    await startTui({ command, args: commandArgs, cwd: process.cwd() });
+    await startTui({ command, args: commandArgs, cwd: process.cwd(), taskId });
   } catch (error) {
     console.error(`Loggie could not start: ${error.message}`);
     process.exit(1);

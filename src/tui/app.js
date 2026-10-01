@@ -3,7 +3,9 @@ import xtermHeadless from '@xterm/headless';
 import { chmod } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
+import { homedir } from 'node:os';
 import { createEventServer } from '../events/event-server.js';
+import { ensureCoordinator } from '../core/runtime.js';
 import { createZshIntegration } from '../shell/integration.js';
 import { addAgentEvent, createTuiState, finishCommand, startCommand } from './state.js';
 import { fitText, truncateMiddle, wrapText } from './text.js';
@@ -168,11 +170,22 @@ function calculateLayout(columns, rows) {
   return { mode: 'bottom', agentColumns: columns, agentRows: Math.max(3, rows - panelHeight - 1), panelWidth: columns, panelHeight };
 }
 
-export async function startTui({ command, args = [], cwd = process.cwd() } = {}) {
+export async function startTui({ command, args = [], cwd = process.cwd(), taskId = null } = {}) {
   if (!process.stdin.isTTY || !process.stdout.isTTY) throw new Error('Loggie TUI needs an interactive terminal.');
   await ensurePtyHelperExecutable();
 
   const state = createTuiState();
+  let coreClient = null;
+  let coreSession = null;
+  let approvedBrief = null;
+  if (taskId) {
+    const dataDirectory = process.env.LOGGIE_CORE_DIR || join(homedir(), 'Library', 'Application Support', 'Loggie', 'core');
+    coreClient = await ensureCoordinator({ dataDirectory });
+    const task = await coreClient.getTask(taskId);
+    if (task.status !== 'briefed') throw new Error(`Task ${taskId} must be briefed before starting a terminal session.`);
+    approvedBrief = await coreClient.getApprovedBrief(taskId);
+    if (!approvedBrief) throw new Error(`Task ${taskId} does not have an approved brief.`);
+  }
   let columns = process.stdout.columns || 120;
   let rows = process.stdout.rows || 35;
   let layout = calculateLayout(columns, rows);
@@ -305,6 +318,25 @@ export async function startTui({ command, args = [], cwd = process.cwd() } = {})
     throw error;
   }
 
+  if (coreClient) {
+    try {
+      coreSession = await coreClient.createSession({ taskId, briefId: approvedBrief.id, workingDirectory: cwd, processId: child.pid, terminalKind: command === 'claude' ? 'claude' : command ? 'antigravity' : 'loggie' });
+      await coreClient.transitionSession(coreSession.id, 'running');
+      await coreClient.transitionTask(taskId, 'running', 'Loggie terminal session started');
+    } catch (error) {
+      child.kill();
+      await eventServer.close();
+      await shellIntegration?.cleanup();
+      throw error;
+    }
+  }
+
+  async function finishCoreSession(status) {
+    if (!coreClient || !coreSession) return;
+    try { await coreClient.transitionSession(coreSession.id, status); } catch {}
+    coreSession = null;
+  }
+
   function terminalLine(row, width) {
     const buffer = terminal.buffer.active;
     const line = buffer.getLine(buffer.viewportY + row);
@@ -365,6 +397,7 @@ export async function startTui({ command, args = [], cwd = process.cwd() } = {})
 
   async function onSignal() {
     child.kill();
+    await finishCoreSession('failed');
     await cleanup();
     process.exit(1);
   }
@@ -381,6 +414,7 @@ export async function startTui({ command, args = [], cwd = process.cwd() } = {})
     terminal.write(data, scheduleRender);
   });
   child.onExit(async ({ exitCode }) => {
+    await finishCoreSession(exitCode === 0 ? 'completed' : 'failed');
     await cleanup();
     process.exitCode = exitCode;
   });

@@ -21,7 +21,12 @@
 
       <section class="conversation" id="conversation" aria-live="polite">
         <h1>Hi, I’m Loggie.</h1>
-        <p class="intro" id="intro">Connect Gmail to find and read the conversations you ask for.</p>
+        <p class="intro" id="intro">Tell me what you want to open or find.</p>
+
+        <section class="command-section" aria-labelledby="command-heading">
+          <div class="section-heading"><div><h2 id="command-heading">Recent</h2><p>Commands run locally on this Mac.</p></div><button class="text-button" id="clearCommands" type="button">Clear</button></div>
+          <div class="command-history" id="commandHistory" aria-live="polite"></div>
+        </section>
 
         <section class="settings-section" id="accountSection" aria-labelledby="accounts-heading">
           <h2 id="accounts-heading">Accounts</h2>
@@ -59,10 +64,10 @@
 
       <form class="composer" id="composer">
         <div class="input-row">
-          <textarea id="message" rows="1" maxlength="500" aria-label="Search Gmail" placeholder="Find Daniel’s latest email" disabled></textarea>
-          <button class="send-button" id="searchButton" type="submit" aria-label="Search Gmail" disabled><span aria-hidden="true">↑</span></button>
+          <textarea id="message" rows="1" maxlength="500" aria-label="Tell Loggie what to do" placeholder="Tell Loggie what you want…"></textarea>
+          <button class="send-button" id="searchButton" type="submit" aria-label="Send command"><span aria-hidden="true">↑</span></button>
         </div>
-        <div class="composer-meta"><span id="composerHint">Connect Gmail to search</span><button id="hide" class="text-button" type="button">Hide Loggie</button></div>
+        <div class="composer-meta"><span id="composerHint">Open files and folders · Gmail read-only</span><button id="hide" class="text-button" type="button">Hide Loggie</button></div>
       </form>
     </main>
     <script src="panel.js"></script>
