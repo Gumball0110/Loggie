@@ -2,6 +2,25 @@
 
 Loggie is a small, friendly desktop companion for macOS. Its original terminal companion is still included and explains commands, failures, risk, and AI coding-agent activity.
 
+> [!NOTE]
+> **Collaborator quick setup**
+>
+> 1. Clone the repository and switch to the current development branch:
+>    ```bash
+>    git clone https://github.com/Gumball0110/Loggie.git
+>    cd Loggie
+>    git switch codex/milestone-2-gmail
+>    ```
+> 2. Install dependencies and run the tests:
+>    ```bash
+>    npm install
+>    npm test
+>    ```
+> 3. Start Loggie:
+>    ```bash
+>    npm run desktop
+>    ```
+
 ## Requirements
 
 - macOS
